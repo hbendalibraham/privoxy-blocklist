@@ -1,8 +1,11 @@
+
+# :exclamation: The default branch **changed** to `main`. :exclamation:
+## Please migrate your project if you see this.
+
+---
+
 privoxy-blocklist
 =================
-
-:exclamation: The default branch **changed** to `main`. :exclamation:
-Please migrate your project if you see this.
 
 [![Test Suite](https://github.com/Andrwe/privoxy-blocklist/actions/workflows/pytest.yml/badge.svg)](https://github.com/Andrwe/privoxy-blocklist/actions/workflows/pytest.yml)
 [![GitHub release](https://img.shields.io/github/release/Andrwe/privoxy-blocklist?include_prereleases=&sort=semver&color=blue)](https://github.com/Andrwe/privoxy-blocklist/releases/)
