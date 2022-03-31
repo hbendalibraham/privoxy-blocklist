@@ -7,6 +7,8 @@
 #                  Version: <main>
 #                  URL: http://andrwe.dyndns.org/doku.php/scripting/bash/privoxy-blocklist
 #
+#                  Moded by: Hamza BENDALI BRAHAM <hbendali@ya.ru>
+#                  For: OpenWrt Privoxy version 3.0.28
 ##################
 #
 #                  Sumary:
@@ -37,11 +39,11 @@ DEPENDS=('privoxy' 'sed' 'grep' 'bash' 'wget')
 ######################################################################
 
 function usage() {
-    echo "${TMPNAME:-this} is a script to convert AdBlockPlus-lists into Privoxy-lists and install them."
+    echo "${TMPNAME:-this} is a script to convert AdBlockPlus-lists into Privoxy-lists for OpenWrt and install them."
     echo " "
     echo "Options:"
     echo "      -h:    Show this help."
-    echo "      -c:    Path to script configuration file. (default = OS specific)"
+    echo "      -c:    Path to script configuration file."
     echo "      -q:    Don't give any output."
     echo "      -v 1:  Enable verbosity 1. Show a little bit more output."
     echo "      -v 2:  Enable verbosity 2. Show a lot more output."
@@ -68,17 +70,7 @@ function prepare() {
 
     if [ -z "${SCRIPTCONF:-}" ]; then
         # script config-file
-        case "${OS}" in
-            "Darwin")
-                SCRIPTCONF="/usr/local/etc/privoxy-blocklist.conf"
-                ;;
-            *)
-                SCRIPTCONF="/etc/privoxy-blocklist.conf"
-                ;;
-        esac
-        if [ -f "/etc/conf.d/privoxy-blacklist" ]; then
-            SCRIPTCONF="/etc/conf.d/privoxy-blacklist"
-        fi
+        SCRIPTCONF="/etc/privoxy/blocklist.conf"
     fi
 
     if [[ ! -d "$(dirname "${SCRIPTCONF}")" ]]; then
@@ -93,19 +85,26 @@ function prepare() {
 
 # array of URL for AdblockPlus lists
 #  for more sources just add it within the round brackets
-URLS=("https://easylist-downloads.adblockplus.org/easylistgermany.txt" "https://easylist-downloads.adblockplus.org/easylist.txt")
+URLS=(
+"https://easylist-downloads.adblockplus.org/malwaredomains_full.txt"
+"https://easylist-downloads.adblockplus.org/fanboy-social.txt"
+"https://easylist-downloads.adblockplus.org/easyprivacy.txt"
+"https://easylist-downloads.adblockplus.org/easylist.txt"
+"https://easylist-downloads.adblockplus.org/easylistdutch.txt"
+# "https://easylist-downloads.adblockplus.org/easylistdutch+easylist.txt"
+)
 
 # config for privoxy initscript providing PRIVOXY_CONF, PRIVOXY_USER and PRIVOXY_GROUP
 INIT_CONF="/etc/conf.d/privoxy"
 
 # !! set these when config INIT_CONF doesn't exist and default values do not match your system !!
 # !! These values will be overwritten by INIT_CONF when exists !!
-#PRIVOXY_USER="privoxy"
-#PRIVOXY_GROUP="root"
-#PRIVOXY_CONF="/etc/privoxy/config"
+PRIVOXY_USER="root"
+PRIVOXY_GROUP="root"
+PRIVOXY_CONF="/etc/config/privoxy"
 
 # name for lock file (default: script name)
-TMPNAME="\$(basename "\$(readlink -f "\${0}")")"
+TMPNAME="\$(basename \${0})"
 # directory for temporary files
 TMPDIR="/tmp/\${TMPNAME}"
 
@@ -140,20 +139,12 @@ EOF
 
     # check whether needed variables are set
     if [[ -z "${PRIVOXY_CONF:-}" ]]; then
-        case "${OS}" in
-            "Darwin")
-                PRIVOXY_CONF="/usr/local/etc/privoxy/config"
-                ;;
-            *)
-                PRIVOXY_CONF="/etc/privoxy/config"
-                ;;
-        esac
         PRIVOXY_CONF="/etc/privoxy/config"
-        info "\$PRIVOXY_CONF isn't set, falling back to '/etc/privoxy/config'"
+        info "\$PRIVOXY_CONF isn't set, falling back to '/etc/config/privoxy'"
     fi
     if [[ -z "${PRIVOXY_USER:-}" ]]; then
-        PRIVOXY_USER="privoxy"
-        info "\$PRIVOXY_USER isn't set, falling back to 'privoxy'"
+        PRIVOXY_USER="root"
+        info "\$PRIVOXY_USER isn't set, falling back to 'root'"
     fi
     if [[ -z "${PRIVOXY_GROUP:-}" ]]; then
         PRIVOXY_GROUP="root"
